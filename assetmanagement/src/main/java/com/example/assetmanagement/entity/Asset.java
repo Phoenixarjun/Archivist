@@ -33,12 +33,6 @@ public class Asset {
     @Column(nullable = false)
     private String category;
 
-    @Column(name = "purchase_date")
-    private LocalDate purchaseDate;
-
-    @Column(name = "purchase_price")
-    private BigDecimal purchasePrice;
-
     @Column(nullable = false)
     private String status;
 

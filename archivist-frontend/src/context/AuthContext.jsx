@@ -1,76 +1,77 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
-import apiClient from '../utils/apiClient';
+import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
+import { apiService } from '../services/apiService';
+import { jwtDecode } from 'jwt-decode'; // You might need to install this: npm install jwt-decode
 
 const AuthContext = createContext(null);
 
-export const useAuth = () => useContext(AuthContext);
-
 export const AuthProvider = ({ children }) => {
-  const [authState, setAuthState] = useState({
-    token: localStorage.getItem('token') || null,
-    isAuthenticated: !!localStorage.getItem('token'),
-    loading: true,
-    user: null,
-  });
+    const [user, setUser] = useState(null);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [loading, setLoading] = useState(true);
 
-  const loadUser = async () => {
-    if (localStorage.token) {
-      try {
-        const res = await apiClient.get('/auth/me'); 
-        setAuthState({
-          token: localStorage.getItem('token'),
-          isAuthenticated: true,
-          loading: false,
-          user: res.data,
-        });
-      } catch (err) {
-        console.error(err);
-        logout();
-      }
-    } else {
-      setAuthState({ token: null, isAuthenticated: false, loading: false, user: null });
+    const fetchUser = useCallback(async () => {
+        const token = localStorage.getItem('token');
+        let userPayload = null;
+        if (token) {
+            try {
+                const decodedToken = jwtDecode(token);
+                userPayload = {
+                    email: decodedToken.sub,
+                    role: decodedToken.role,
+                    name: decodedToken.name
+                };
+                setUser(userPayload);
+                setIsAuthenticated(true);
+            } catch (error) {
+                console.error("Invalid token", error);
+                localStorage.removeItem('token');
+                setUser(null);
+                setIsAuthenticated(false);
+            }
+        } else {
+            setIsAuthenticated(false);
+        }
+        setLoading(false);
+        return userPayload;
+    }, []);
+
+    useEffect(() => {
+        fetchUser();
+    }, [fetchUser]);
+
+    const login = async (credentials) => {
+        const response = await apiService.login(credentials);
+        if (response.token) {
+            localStorage.setItem('token', response.token);
+            return await fetchUser();
+        } else {
+            throw new Error("Login failed: No token received");
+        }
+    };
+
+    const register = async (userData) => {
+        return await apiService.register(userData);
+    };
+
+    const logout = () => {
+        setUser(null);
+        setIsAuthenticated(false);
+        localStorage.removeItem('token');
+    };
+
+    const value = { user, isAuthenticated, login, register, logout, loading };
+
+    return (
+        <AuthContext.Provider value={value}>
+            {!loading && children}
+        </AuthContext.Provider>
+    );
+};
+
+export const useAuth = () => {
+    const context = useContext(AuthContext);
+    if (context === undefined) {
+        throw new Error('useAuth must be used within an AuthProvider');
     }
-  };
-
-  useEffect(() => {
-    loadUser();
-  }, []);
-
-  const login = async (email, password) => {
-    const body = { username: email, password };
-    try {
-      const res = await apiClient.post('/auth/login', body);
-      localStorage.setItem('token', res.data.accessToken);
-      await loadUser();
-      return res;
-    } catch (err) {
-      console.error(err.response.data);
-      throw err;
-    }
-  };
-
-  const register = async (userData) => {
-    try {
-      const res = await apiClient.post('/auth/register', userData);
-      // Optionally log the user in directly after registration
-      return res;
-    } catch (err) {
-      console.error(err.response.data);
-      throw err;
-    }
-  };
-
-  const logout = () => {
-    localStorage.removeItem('token');
-    setAuthState({
-      token: null,
-      isAuthenticated: false,
-      loading: false,
-      user: null,
-    });
-  };
-
-  const value = { ...authState, login, register, logout, loadUser };
-
-  return <AuthContext.Provider value={value}>{!authState.loading && children}</AuthContext.Provider>;
+    return context;
 };

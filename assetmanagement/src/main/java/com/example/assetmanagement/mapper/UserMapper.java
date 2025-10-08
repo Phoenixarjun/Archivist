@@ -6,6 +6,8 @@ import com.example.assetmanagement.dto.UserResponseDto;
 import com.example.assetmanagement.entity.Login;
 import com.example.assetmanagement.entity.User;
 
+import java.util.UUID;
+
 public class UserMapper {
 
     public static UserDto toUserDto(User user) {
@@ -26,7 +28,8 @@ public class UserMapper {
         userResponseDto.setLastName(user.getLastName());
         userResponseDto.setRole(user.getRole());
         if (user.getLogin() != null) {
-            userResponseDto.setUsername(user.getLogin().getUsername());
+            // The getUsername() method on Login now returns the email.
+            userResponseDto.setUsername(user.getLogin().getUsername()); 
             userResponseDto.setEmail(user.getLogin().getEmail());
         }
         return userResponseDto;
@@ -34,13 +37,13 @@ public class UserMapper {
 
     public static User fromRegisterRequestDto(RegisterRequestDto registerRequestDto) {
         User user = new User();
-        user.setEmployeeId(registerRequestDto.getEmployeeId());
         user.setFirstName(registerRequestDto.getFirstName());
         user.setLastName(registerRequestDto.getLastName());
         user.setRole(registerRequestDto.getRole());
+        user.setEmployeeId(UUID.randomUUID().toString());
 
         Login login = new Login();
-        login.setUsername(registerRequestDto.getUsername());
+        // The username field is removed from Login entity to resolve conflict.
         login.setEmail(registerRequestDto.getEmail());
         login.setPassword(registerRequestDto.getPassword());
         user.setLogin(login);

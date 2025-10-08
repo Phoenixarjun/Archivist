@@ -10,8 +10,6 @@ public class AssetDto {
     private String name;
     private String description;
     private String category;
-    private LocalDate purchaseDate;
-    private BigDecimal purchasePrice;
     private String status;
     private Long assignedToUserId;
 }

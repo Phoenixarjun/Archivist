@@ -1,11 +1,14 @@
 import React from 'react';
-import { Container } from 'react-bootstrap';
+import PageHeader from '../components/common/PageHeader';
+import { useAuth } from '../context/AuthContext';
 
 const DashboardPage = () => {
+  const { user } = useAuth();
   return (
-    <Container>
-      <h1>Dashboard</h1>
-    </Container>
+    <>
+      <PageHeader title="Dashboard" subtitle={`Welcome back, ${user?.firstName}!`} />
+      {/* Dashboard content like StatCards and tables will go here */}
+    </>
   );
 };
 
