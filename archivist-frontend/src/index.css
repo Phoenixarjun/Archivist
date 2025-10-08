@@ -1,11 +1,22 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  /* Project Theme Colors */
+  --primary: #0A4D68;
+  --primary-light: #088395;
+  --secondary: #F8F9FA;
+  --success: #198754;
+  --danger: #DC3545;
+  --warning: #FFC107;
+  --text-primary: #212529;
+  --text-secondary: #6C757D;
+  --white: #FFFFFF;
+  --accent-gradient: linear-gradient(135deg, #088395, #0A4D68);
+
+  /* Base Styles */
+  font-family: 'Poppins', sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
