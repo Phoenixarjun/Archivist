@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 
 @Component
-public class JwtTokenUtil {
+public class JwtTokenProvider {
 
     @Value("${app.jwt-secret}")
     private String jwtSecret;
@@ -44,7 +44,6 @@ public class JwtTokenUtil {
             Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
             return true;
         } catch (Exception ex) {
-            // Can be more specific with exceptions like MalformedJwtException, ExpiredJwtException, etc.
             return false;
         }
     }

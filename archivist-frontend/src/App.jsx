@@ -1,16 +1,18 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import { Container, Button } from 'react-bootstrap';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { Container } from 'react-bootstrap';
 import './App.css'
+import HomePage from './pages/HomePage';
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <Container className="text-center bg-black">
-    </Container>
-  )
+    <Router>
+      <Container>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+        </Routes>
+      </Container>
+    </Router>
+  );
 }
 
-export default App
+export default App;
